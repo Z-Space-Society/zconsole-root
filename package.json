@@ -1,0 +1,47 @@
+{
+  "name": "mini-app-starter",
+  "private": true,
+  "description": "A opinionated starter template for building small mini apps for you and your friends. Built using Local First Auth, Cloudflare Workers, D1, and Durable Objects.",
+  "license": "MIT",
+  "keywords": [
+    "antler",
+    "local-first-auth",
+    "cloudflare-workers",
+    "d1",
+    "durable-objects",
+    "did",
+    "decentralized-identity"
+  ],
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "predev": "tsx scripts/build-client-if-missing.ts && pnpm --filter=@starter/shared build",
+    "predev:simulator": "tsx scripts/build-client-if-missing.ts && pnpm --filter=@starter/shared build",
+    "dev": "concurrently \"wrangler dev --local\" \"pnpm dev:client\" --names \"worker,client\" --prefix-colors \"blue,green\"",
+    "dev:simulator": "concurrently \"wrangler dev --local\" \"pnpm dev:client:simulator\" --names \"worker,client\" --prefix-colors \"blue,green\"",
+    "dev:client": "pnpm --filter=./client dev",
+    "dev:client:simulator": "pnpm --filter=./client dev:simulator",
+    "dev:server": "wrangler dev --local",
+    "deploy:cloudflare": "pnpm build && alchemy deploy",
+    "destroy:cloudflare": "alchemy destroy",
+    "build": "pnpm run --filter=@starter/shared build && pnpm run --filter=./client build",
+    "build:client": "pnpm --filter=./client build",
+    "db:generate-migrations": "pnpm --filter=./server db:generate-migrations",
+    "db:run-migrations": "tsx scripts/run-dev-migrations.ts",
+    "setup-project": "tsx scripts/setup.ts"
+  },
+  "dependencies": {
+    "@noble/curves": "^2.0.1",
+    "base58-universal": "^2.0.0",
+    "drizzle-orm": "^0.44.7",
+    "jwt-decode": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "alchemy": "0.77.0",
+    "concurrently": "^9.2.1",
+    "tsx": "^4.21.0",
+    "typescript": "~5.9.3",
+    "wrangler": "^4.53.0"
+  }
+}

@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+/* =============================================================================
+   Theme Configuration (Tailwind v4 CSS-first approach)
+   ============================================================================= */
+
+@theme {
+  /* Brand colors */
+  --color-primary: #403B51;
+  --color-primary-hover: #322d40;
+
+  /* Surface colors */
+  --color-card: white;
+  --color-background: white;
+
+  /* Gradient colors for page background */
+  --color-gradient-start: #faf5ff; /* purple-50 */
+  --color-gradient-end: #eff6ff;   /* blue-50 */
+
+  /* QR panel gradient */
+  --color-qr-gradient-start: #e0e7ff; /* indigo-100 */
+  --color-qr-gradient-end: #f3e8ff;   /* purple-100 */
+}
+
+/* =============================================================================
+   Component Patterns
+   ============================================================================= */
+
+@layer components {
+  /* Primary button - brand color with hover effects */
+  .btn-primary {
+    @apply bg-primary text-white rounded-full shadow-lg
+           hover:bg-primary-hover transition-all hover:scale-105 font-semibold;
+  }
+
+  /* Card container */
+  .card {
+    @apply bg-card rounded-lg shadow-lg;
+  }
+}
