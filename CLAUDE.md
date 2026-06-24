@@ -4,6 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
+> **This repo is now the multi-app HOST**, not a single mini app. It is the catch-all
+> Cloudflare Worker that serves a **landing grid** of mini apps (`client/src/apps.ts`) at `/`,
+> plus an SPA fallback for unclaimed paths. Each mini app is an **independent Worker in its own
+> repo**, bound to `<domain>/<slug>` + `<domain>/<slug>/*` (most-specific route wins), with its
+> own D1 + Durable Object. The host has no D1/DO/auth/WebSocket.
+> See [`docs/domain-setup.md`](./docs/domain-setup.md) (zone + proxied DNS + routes prerequisite)
+> and [`docs/hosting-a-mini-app.md`](./docs/hosting-a-mini-app.md) (child-app subpath + admin contract).
+>
+> **The sections below describe the legacy single-app starter** and are kept as reference for
+> what a child mini app looks like — they do not all reflect this host repo's current code.
+
 A starter template for building mini apps for you and your friends. Uses Local First Auth spec for user signup and authentication, SQLite database, WebSocket for real-time updates, REST API for backend endpoints.
 
 ### Project Structure

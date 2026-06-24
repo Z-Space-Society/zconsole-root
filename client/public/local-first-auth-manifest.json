@@ -1,9 +1,7 @@
 {
-  "name": "Local First Auth Starter",
-  "description": "A starter template for building Local First Auth mini apps",
+  "name": "Mini Apps",
+  "description": "A directory of mini apps for you and your friends",
   "icon": "./icon.webp",
   "type": "app",
-  "permissions": [
-    "profile"
-  ]
+  "permissions": []
 }

@@ -1,37 +1,42 @@
-import { useLocalFirstAuth } from '../hooks/useLocalFirstAuth'
-import { AdminSection } from '../components/AdminSection'
-import { Avatar } from '../components/Avatar'
+import { apps } from '../apps'
 
 export function Home() {
-  const { user, setIsOnboardingModalOpen, getProfileJwt } = useLocalFirstAuth()
-
   return (
-    <div className="w-full max-w-md mx-auto">
-      {/* User Card */}
-      {user && (
-        <div className="card p-6 text-center mb-6">
-          <Avatar avatar={user.avatar} name={user.name} />
-          <h1 className="text-2xl font-bold text-gray-900">{user.name}</h1>
-          <p className="text-gray-500 text-sm mt-1 truncate">{user.did}</p>
+    <div className="w-full max-w-5xl mx-auto px-4 py-12 sm:py-16">
+      <header className="text-center mb-10 sm:mb-14">
+        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">
+          Welcome to ZSpace
+        </h1>
+      </header>
+
+      {apps.length === 0 ? (
+        <div className="card p-10 text-center text-gray-500">
+          No apps yet. Add one in <code className="font-mono">client/src/apps.ts</code>.
         </div>
-      )}
-
-      {/* "Add yourself" button - only show on mobile */}
-      <button
-        onClick={() => setIsOnboardingModalOpen(true)}
-        className="w-full btn-primary px-8 py-4 text-lg z-40 md:hidden"
-      >
-        Add yourself
-      </button>
-
-      {/* Admin Section - only show if user is admin */}
-      {user?.isAdmin && (
-        <AdminSection
-          getProfileJwt={getProfileJwt}
-          onReset={() => {}}
-        />
+      ) : (
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {apps.map((app) => (
+            <li key={app.slug}>
+              {/* Real anchor, not React Router Link: each app is a separate
+                  Worker/document, so the browser must do a full navigation. */}
+              <a
+                href={app.path}
+                className="card group block h-full p-6 transition-all hover:-translate-y-1 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                <div
+                  className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${app.accent} text-3xl shadow-sm`}
+                >
+                  <span aria-hidden="true">{app.icon}</span>
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900 group-hover:text-primary">
+                  {app.name}
+                </h2>
+                <p className="mt-1 text-sm text-gray-500">{app.description}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   )
 }
-

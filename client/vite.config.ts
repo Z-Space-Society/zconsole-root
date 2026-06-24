@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
+// The host (landing grid) lives at the zone root, so base stays '/'.
+// Each child mini app sets its own `base: '/<slug>/'` (see docs/hosting-a-mini-app.md).
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],

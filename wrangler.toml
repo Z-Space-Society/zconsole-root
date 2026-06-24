@@ -1,32 +1,16 @@
-# This is used in development only (Alchemy is used for production deployments)
+# This is used in development only (Alchemy is used for production deployments).
+#
+# The host is the catch-all Worker that serves the landing grid. It has no D1 or
+# Durable Object — those live in each independent child mini app.
 
-name = "mini-app-starter-dev"
+name = "zconsole-dev"
 main = "server/src/index.ts"
 compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
 
-# D1 Database binding
-[[d1_databases]]
-binding = "DB"
-database_name = "mini-app-starter-dev-db"
-database_id = "local"
-
-# Durable Object binding
-[[durable_objects.bindings]]
-name = "DURABLE_OBJECT"
-class_name = "Broadcaster"
-script_name = "mini-app-starter-dev"
-
-# Durable Object migration
-[[migrations]]
-tag = "v1"
-new_classes = ["Broadcaster"]
-
 # Static assets (client build)
-# In dev: Vite serves client at :5173 (this is unused)
-# In production: Alchemy uploads these assets to Workers
-# [site]
-# bucket = "./client/dist"
+# In dev: Vite serves the client at :5173 (this is unused).
+# In production: Alchemy uploads ./client/dist to Workers Assets.
 
 # Dev server configuration
 [dev]

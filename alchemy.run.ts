@@ -1,59 +1,43 @@
 /**
- * Alchemy Configuration for Local First Auth Starter
+ * Alchemy configuration for the multi-app HOST.
  *
- * Deploys the starter mini-app to Cloudflare:
- * - D1 Database for user storage
- * - Durable Object for real-time WebSocket broadcasting
- * - Worker for API and static asset serving
+ * This repo is the catch-all Worker: it serves the landing-grid SPA and an SPA
+ * fallback for any path not claimed by a more-specific child app Worker. Child
+ * mini apps live in their own repos, are deployed independently, and bind their
+ * own route patterns (`<domain>/<slug>` + `<domain>/<slug>/*`). Cloudflare resolves
+ * the most-specific route first, so child apps automatically override this catch-all.
+ *
+ * Path-based routes only work on a Cloudflare zone (a custom domain), NOT on
+ * *.workers.dev. This script always deploys to a workers.dev URL via `url: true`; the
+ * custom-domain route is attached manually in the Cloudflare dashboard once the zone +
+ * a proxied DNS record exist (see docs/domain-setup.md).
  */
 
 import alchemy from 'alchemy'
-import { Assets, D1Database, DurableObjectNamespace, Worker } from 'alchemy/cloudflare'
+import { Assets, Worker } from 'alchemy/cloudflare'
 import { CloudflareStateStore } from 'alchemy/state'
-import type { Broadcaster } from './server/src/durable-object'
 
 // Initialize Alchemy app with remote state store
-const app = await alchemy('mini-app-starter', {
+const app = await alchemy('zconsole', {
   stateStore: (scope) => new CloudflareStateStore(scope),
 })
 
 /**
- * D1 Database
- * Stores user information
- */
-const database = await D1Database(`${app.name}-${app.stage}-db`, {
-  name: `${app.name}-${app.stage}-db`,
-  migrationsDir: './server/src/db/migrations',
-  adopt: true,
-})
-
-/**
- * Static Assets
- * Client build directory containing the React app
+ * Static Assets — the built landing-grid client.
  */
 const staticAssets = await Assets({
   path: './client/dist',
 })
 
 /**
- * Durable Object Namespace
- * Manages real-time WebSocket connections for broadcasting user updates
- */
-const durableObject = DurableObjectNamespace<Broadcaster>(`${app.name}-${app.stage}-durable-object`, {
-  className: 'Broadcaster',
-  sqlite: true,
-})
-
-/**
- * Cloudflare Worker
- * Handles API routes, WebSocket upgrades, and serves static client assets
+ * Catch-all host Worker. Deploys to a workers.dev URL; attach the custom-domain
+ * route (`<domain>/*`) manually in the Cloudflare dashboard — Workers & Pages →
+ * this worker → Settings → Domains & Routes → Add route. See docs/domain-setup.md.
  */
 export const worker = await Worker('worker', {
   name: `${app.name}-${app.stage}`,
   entrypoint: './server/src/index.ts',
   bindings: {
-    DB: database,
-    DURABLE_OBJECT: durableObject,
     ASSETS: staticAssets,
   },
   assets: {
@@ -69,7 +53,5 @@ await app.finalize()
 console.log('✅ Alchemy deployment complete')
 console.log(`📦 App: ${app.name}`)
 console.log(`🌍 Stage: ${app.stage}`)
-console.log(`🗄️  D1 Database: ${database.name}`)
-console.log(`🔄 Durable Object: ${durableObject.className}`)
 console.log(`⚡ Worker: ${worker.name}`)
 console.log(`🌐 URL: ${worker.url}`)
