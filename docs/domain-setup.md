@@ -34,6 +34,11 @@ Alchemy needs a `CLOUDFLARE_API_TOKEN` (and account access) with at least:
 - **Zone: Read** (and **Zone: Edit** if you manage the zone via Alchemy `Zone`)
 - **DNS: Edit** (if you manage DNS records via Alchemy)
 
+> **Multiple Cloudflare accounts?** If your credentials can see more than one account,
+> Alchemy picks one arbitrarily. Set `CLOUDFLARE_ACCOUNT_ID` in `.env` to pin the target
+> account — and make sure those credentials actually have access to it (`pnpm wrangler
+> whoami` should list it; otherwise use a `CLOUDFLARE_API_TOKEN` scoped to that account).
+
 ## 4. Deploy the host and attach the route
 
 Deploy the host Worker:
