@@ -45,4 +45,12 @@ export const apps: MiniApp[] = [
     icon: '📅',
     accent: 'from-violet-400 to-indigo-300',
   },
+  {
+    slug: 'library',
+    name: 'Library',
+    description: 'Browse and borrow books from the ZSpace library.',
+    path: '/library',
+    icon: '📚',
+    accent: 'from-emerald-400 to-teal-300',
+  },
 ]
