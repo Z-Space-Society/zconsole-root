@@ -26,6 +26,11 @@ export interface MiniApp {
   icon: string
   /** Tailwind gradient classes for the card's icon tile accent. */
   accent: string
+  /**
+   * When true, this card is a route served by the host itself (e.g. /settings),
+   * so it links via client-side routing instead of a cross-document navigation.
+   */
+  internal?: boolean
 }
 
 export const apps: MiniApp[] = [
@@ -52,5 +57,14 @@ export const apps: MiniApp[] = [
     path: '/library/',
     icon: '📚',
     accent: 'from-emerald-400 to-teal-300',
+  },
+  {
+    slug: 'settings',
+    name: 'Settings',
+    description: 'Create or edit your profile.',
+    path: '/settings',
+    icon: '⚙️',
+    accent: 'from-slate-400 to-slate-300',
+    internal: true,
   },
 ]

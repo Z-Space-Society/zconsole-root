@@ -14,7 +14,7 @@
  */
 
 import alchemy from 'alchemy'
-import { Assets, Worker } from 'alchemy/cloudflare'
+import { Assets, D1Database, Worker } from 'alchemy/cloudflare'
 import { CloudflareStateStore } from 'alchemy/state'
 
 // Initialize Alchemy app with remote state store
@@ -30,6 +30,33 @@ const staticAssets = await Assets({
 })
 
 /**
+ * Host's own D1 — stores the operator allowlist (`users.is_admin`) that gates the admin
+ * console. The host owns this schema, so it applies its own migrations.
+ */
+const database = await D1Database(`${app.name}-${app.stage}-db`, {
+  name: `${app.name}-${app.stage}-db`,
+  migrationsDir: './server/src/db/migrations',
+  adopt: true,
+})
+
+/**
+ * Managed child app D1s, adopted by name (NOT created or migrated here — each child app
+ * owns its schema). The host writes `users.is_admin` directly. This requires every app to
+ * live in the same pinned Cloudflare account (see docs/domain-setup.md §3).
+ *
+ * NOTE: replace these names with the real ones from `pnpm wrangler d1 list`. Keep them in
+ * sync with server/src/admin-apps.ts and wrangler.toml.
+ */
+const eventsDb = await D1Database(`events-${app.stage}-db`, {
+  name: `zconsole-events-mini-app-prod-db`,
+  adopt: true,
+})
+const libraryDb = await D1Database(`library-${app.stage}-db`, {
+  name: `library-${app.stage}-db`,
+  adopt: true,
+})
+
+/**
  * Catch-all host Worker. Deploys to a workers.dev URL; attach the custom-domain
  * route (`<domain>/*`) manually in the Cloudflare dashboard — Workers & Pages →
  * this worker → Settings → Domains & Routes → Add route. See docs/domain-setup.md.
@@ -39,6 +66,11 @@ export const worker = await Worker('worker', {
   entrypoint: './server/src/index.ts',
   bindings: {
     ASSETS: staticAssets,
+    DB: database,
+    DB_EVENTS: eventsDb,
+    DB_LIBRARY: libraryDb,
+    // Comma-separated DID allowlist that bootstraps the first host admin(s).
+    ADMIN_DIDS: process.env.ADMIN_DIDS ?? '',
   },
   assets: {
     html_handling: 'auto-trailing-slash',
@@ -53,5 +85,6 @@ await app.finalize()
 console.log('✅ Alchemy deployment complete')
 console.log(`📦 App: ${app.name}`)
 console.log(`🌍 Stage: ${app.stage}`)
+console.log(`🗄️  Host D1: ${database.name}`)
 console.log(`⚡ Worker: ${worker.name}`)
 console.log(`🌐 URL: ${worker.url}`)

@@ -8,7 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > Cloudflare Worker that serves a **landing grid** of mini apps (`client/src/apps.ts`) at `/`,
 > plus an SPA fallback for unclaimed paths. Each mini app is an **independent Worker in its own
 > repo**, bound to `<domain>/<slug>` + `<domain>/<slug>/*` (most-specific route wins), with its
-> own D1 + Durable Object. The host has no D1/DO/auth/WebSocket.
+> own D1 + Durable Object. The host has no Durable Object/WebSocket, but it DOES have its own D1
+> and an authed admin API (`server/src/index.ts`, `/api/admin/*`): the Settings → Admin console
+> binds each managed app's D1 directly to set `users.is_admin` (see `server/src/admin-apps.ts`
+> and `docs/admin-setup.md`).
 > See [`docs/domain-setup.md`](./docs/domain-setup.md) (zone + proxied DNS + routes prerequisite)
 > and [`docs/hosting-a-mini-app.md`](./docs/hosting-a-mini-app.md) (child-app subpath + admin contract).
 >

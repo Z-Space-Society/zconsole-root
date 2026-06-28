@@ -1,12 +1,35 @@
 # This is used in development only (Alchemy is used for production deployments).
 #
-# The host is the catch-all Worker that serves the landing grid. It has no D1 or
-# Durable Object — those live in each independent child mini app.
+# The host is the catch-all Worker that serves the landing grid. It also runs the admin
+# console, so it has its own D1 (operator allowlist) plus bindings to each managed child
+# app's D1. Replace the database_id placeholders with real values from
+# `pnpm wrangler d1 list` (and `wrangler d1 create` for the host DB in local dev). Keep
+# the bindings in sync with alchemy.run.ts and server/src/admin-apps.ts.
 
 name = "zconsole-dev"
 main = "server/src/index.ts"
 compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
+
+# Host's own D1 — stores the operator allowlist (users.is_admin) that gates the console.
+[[d1_databases]]
+binding = "DB"
+database_name = "zconsole-dev-db"
+database_id = "REPLACE_WITH_HOST_DB_ID"
+
+[[d1_databases]]
+binding = "DB_EVENTS"
+database_name = "events-dev-db"
+database_id = "REPLACE_WITH_EVENTS_DB_ID"
+
+[[d1_databases]]
+binding = "DB_LIBRARY"
+database_name = "library-dev-db"
+database_id = "REPLACE_WITH_LIBRARY_DB_ID"
+
+# Comma-separated DID allowlist that bootstraps the first host admin(s) in local dev.
+[vars]
+ADMIN_DIDS = ""
 
 # Static assets (client build)
 # In dev: Vite serves the client at :5173 (this is unused).

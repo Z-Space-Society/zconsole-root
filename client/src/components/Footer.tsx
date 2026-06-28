@@ -1,12 +1,12 @@
 export function Footer() {
   return (
-    <div className="mt-4 text-center text-sm text-gray-500">
-      This app is an {' '}
+    <div className="mt-4 pb-4 text-center text-sm text-gray-500">
+      This is an {' '}
       <a
-        href="https://github.com/antler-browser/mini-app-starter"
+        href="https://github.com/Z-Space-Society/zconsole-root"
         target="_blank"
         rel="noopener noreferrer"
-        className="text-rose-700 hover:text-rose-800 underline"
+        className="text-primary hover:text-primary-hover underline"
       >
         open source
       </a>

@@ -1,4 +1,9 @@
-import { apps } from '../apps'
+import { Link } from 'react-router-dom'
+import { apps, type MiniApp } from '../apps'
+
+/** Card classes shared by external (cross-document) and internal (host route) links. */
+const cardClasses =
+  'card group block h-full p-6 transition-all hover:-translate-y-1 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary'
 
 export function Home() {
   return (
@@ -17,26 +22,39 @@ export function Home() {
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {apps.map((app) => (
             <li key={app.slug}>
-              {/* Real anchor, not React Router Link: each app is a separate
-                  Worker/document, so the browser must do a full navigation. */}
-              <a
-                href={app.path}
-                className="card group block h-full p-6 transition-all hover:-translate-y-1 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              >
-                <div
-                  className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${app.accent} text-3xl shadow-sm`}
-                >
-                  <span aria-hidden="true">{app.icon}</span>
-                </div>
-                <h2 className="text-xl font-semibold text-gray-900 group-hover:text-primary">
-                  {app.name}
-                </h2>
-                <p className="mt-1 text-sm text-gray-500">{app.description}</p>
-              </a>
+              {/* Internal cards (e.g. Settings) are host routes → client-side Link.
+                  External cards are separate Workers/documents → real anchor so the
+                  browser does a full navigation. */}
+              {app.internal ? (
+                <Link to={app.path} className={cardClasses}>
+                  <CardBody app={app} />
+                </Link>
+              ) : (
+                <a href={app.path} className={cardClasses}>
+                  <CardBody app={app} />
+                </a>
+              )}
             </li>
           ))}
         </ul>
       )}
     </div>
+  )
+}
+
+/** Shared inner markup for both internal and external app cards. */
+function CardBody({ app }: { app: MiniApp }) {
+  return (
+    <>
+      <div
+        className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${app.accent} text-3xl shadow-sm`}
+      >
+        <span aria-hidden="true">{app.icon}</span>
+      </div>
+      <h2 className="text-xl font-semibold text-gray-900 group-hover:text-primary">
+        {app.name}
+      </h2>
+      <p className="mt-1 text-sm text-gray-500">{app.description}</p>
+    </>
   )
 }

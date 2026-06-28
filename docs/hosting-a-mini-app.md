@@ -95,34 +95,30 @@ shows up in the grid:
 { slug: 'guestbook', name: 'Guestbook', description: '…', path: '/guestbook', icon: '📖', accent: 'from-rose-400 to-orange-300' }
 ```
 
-## 8. Standard admin API (for the future central-admin route)
+## 8. Admin console — host binds each app's D1 directly
 
-A planned host route (`/admin`) will let an operator block/remove users across **every**
-mini app by calling each app over HTTP. So each app SHOULD expose a conventional, authed
-admin surface:
+The host's Settings → Admin section lets an operator manage users across **every** managed
+mini app (grant/revoke admin, block, remove). Rather than each app exposing an HTTP admin
+surface, the **host Worker binds each app's D1 database directly** and writes
+`users.is_admin` itself. This is simpler to operate (no per-app admin endpoints to build)
+at the cost of one hard requirement:
 
-| Method   | Path                                  | Purpose         |
-|----------|---------------------------------------|-----------------|
-| `GET`    | `/guestbook/api/admin/users`          | list users      |
-| `DELETE` | `/guestbook/api/admin/users/:did`     | remove a user   |
-| `POST`   | `/guestbook/api/admin/users/:did/block` | block a user  |
+> **All apps must live in the same pinned Cloudflare account** (`CLOUDFLARE_ACCOUNT_ID`,
+> see [`docs/domain-setup.md`](./domain-setup.md) §3). D1 bindings are account-scoped, so a
+> Worker can only bind databases in its own account.
 
-**Authorization — admin DID allowlist (reuses existing auth):** verify the caller's JWT
-with `decodeAndVerifyJWT` from `@starter/shared`, then check the issuer DID against an
-allowlist configured via an `ADMIN_DIDS` env binding.
+What this means for a child app:
 
-```ts
-import { decodeAndVerifyJWT } from '@starter/shared'
+- **Keep the standard `users` table** with a `did` primary key and an `is_admin` column
+  (the starter schema already has this). Grant/revoke/remove/list need no change.
+- **Block needs a `blocked` column.** The starter schema does **not** ship one. If you want
+  the console's "Block" action to work for your app, add a `blocked` integer column to your
+  `users` table; otherwise Block returns an error (the other actions still work).
+- **Note your D1 database name.** The host references it by name. After deploying, run
+  `pnpm wrangler d1 list` and give the name to whoever maintains the host so they can wire
+  it in `alchemy.run.ts`, `wrangler.toml`, and `server/src/admin-apps.ts`.
 
-async function requireAdmin(c) {
-  const jwt = c.req.header('Authorization')?.replace('Bearer ', '')
-  if (!jwt) return c.json({ error: 'Unauthorized' }, 401)
-  const payload = await decodeAndVerifyJWT(jwt)
-  const adminDids = (c.env.ADMIN_DIDS ?? '').split(',').map(s => s.trim()).filter(Boolean)
-  if (!adminDids.includes(payload.iss)) return c.json({ error: 'Forbidden' }, 403)
-  return null // authorized
-}
-```
-
-This keeps each app independently deployable while making the future fan-out admin route a
-pure client of these endpoints — no service bindings or shared database required.
+Authorization lives entirely on the host: it verifies the operator's JWT with
+`decodeAndVerifyJWT` and checks the issuer DID against its own `is_admin` allowlist /
+`ADMIN_DIDS` (see [`docs/admin-setup.md`](./admin-setup.md)). Child apps don't authorize
+these writes — they simply own the schema the host writes to.

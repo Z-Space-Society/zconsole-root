@@ -26,11 +26,14 @@
     "destroy:cloudflare": "alchemy destroy",
     "build": "pnpm run --filter=@starter/shared build && pnpm run --filter=./client build",
     "build:client": "pnpm --filter=./client build",
+    "db:generate-migrations": "pnpm --filter=./server db:generate-migrations",
+    "db:run-migrations": "tsx scripts/run-dev-migrations.ts",
     "setup-project": "tsx scripts/setup.ts"
   },
   "dependencies": {
     "@noble/curves": "^2.0.1",
     "base58-universal": "^2.0.0",
+    "drizzle-orm": "^0.44.7",
     "jwt-decode": "^4.0.0"
   },
   "devDependencies": {
