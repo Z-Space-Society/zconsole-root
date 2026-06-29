@@ -4,13 +4,13 @@
  * The host serves the landing-grid SPA, and now also acts as an admin console: it has
  * its OWN D1 (operator allowlist, used to gate the console) plus direct bindings to each
  * managed child app's D1 (where it flips `users.is_admin`). The child databases are
- * adopted by name in alchemy.run.ts / wrangler.toml and live in the same Cloudflare
- * account. The ASSETS binding is handled by Alchemy's Worker `assets` config.
+ * referenced by UUID in alchemy.run.ts / wrangler.toml (the child apps own them) and live
+ * in the same Cloudflare account. The ASSETS binding is handled by Alchemy's Worker `assets` config.
  */
 import type { ChildBindingKey } from '@starter/shared'
 
 /**
- * Managed child app D1s are adopted by name and keyed by `ChildBindingKey` from
+ * Managed child app D1s are referenced by UUID and keyed by `ChildBindingKey` from
  * `@starter/shared` (the single source of truth for the registry), so the binding keys
  * here can't drift from server/src/admin-apps.ts or alchemy.run.ts.
  */

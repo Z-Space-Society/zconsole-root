@@ -41,24 +41,27 @@ const database = await D1Database(`${app.name}-${app.stage}-db`, {
 })
 
 /**
- * Managed child app D1s, adopted by name (NOT created or migrated here — each child app
- * owns its schema). The host writes `users.is_admin` directly. This requires every app to
- * live in the same pinned Cloudflare account (see docs/domain-setup.md §3).
+ * Managed child app D1s, REFERENCED by UUID (NOT created, adopted, or migrated here — each
+ * child app owns and migrates its own schema). The host only needs the database id to bind it
+ * and write `users.is_admin` directly. Because this is a plain reference object (not a managed
+ * `D1Database()` resource), the host can never create/replace/delete the child's database — it
+ * just points at the existing one. This requires every app to live in the same pinned
+ * Cloudflare account (see docs/domain-setup.md §3).
  *
- * One adopted-by-name database + Worker binding per `MANAGED_APPS` entry — the registry in
- * `@starter/shared` is the single source of truth, shared with server/src/admin-apps.ts.
+ * One Worker binding per `MANAGED_APPS` entry — the registry in `@starter/shared` is the single
+ * source of truth (including each DB's `databaseId`), shared with server/src/admin-apps.ts.
  * Keep wrangler.toml's dev bindings in sync with it.
  */
 const managedDbBindings = Object.fromEntries(
-  await Promise.all(
-    MANAGED_APPS.map(async (managedApp) => [
-      managedApp.bindingKey,
-      await D1Database(managedApp.dbName, {
-        name: managedApp.dbName,
-        adopt: true,
-      }),
-    ]),
-  ),
+  MANAGED_APPS.map((managedApp) => [
+    managedApp.bindingKey,
+    {
+      type: 'd1',
+      id: managedApp.databaseId,
+      name: managedApp.dbName,
+      dev: { id: managedApp.databaseId, remote: false },
+    } satisfies D1Database,
+  ]),
 )
 
 /**
