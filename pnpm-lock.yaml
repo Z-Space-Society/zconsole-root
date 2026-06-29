@@ -11,6 +11,9 @@ importers:
       '@noble/curves':
         specifier: ^2.0.1
         version: 2.0.1
+      '@starter/shared':
+        specifier: workspace:*
+        version: link:shared
       base58-universal:
         specifier: ^2.0.0
         version: 2.0.0

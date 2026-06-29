@@ -16,6 +16,7 @@
 import alchemy from 'alchemy'
 import { Assets, D1Database, Worker } from 'alchemy/cloudflare'
 import { CloudflareStateStore } from 'alchemy/state'
+import { MANAGED_APPS } from '@starter/shared'
 
 // Initialize Alchemy app with remote state store
 const app = await alchemy('zconsole', {
@@ -44,17 +45,21 @@ const database = await D1Database(`${app.name}-${app.stage}-db`, {
  * owns its schema). The host writes `users.is_admin` directly. This requires every app to
  * live in the same pinned Cloudflare account (see docs/domain-setup.md §3).
  *
- * NOTE: replace these names with the real ones from `pnpm wrangler d1 list`. Keep them in
- * sync with server/src/admin-apps.ts and wrangler.toml.
+ * One adopted-by-name database + Worker binding per `MANAGED_APPS` entry — the registry in
+ * `@starter/shared` is the single source of truth, shared with server/src/admin-apps.ts.
+ * Keep wrangler.toml's dev bindings in sync with it.
  */
-const eventsDb = await D1Database(`events-${app.stage}-db`, {
-  name: `zconsole-events-mini-app-prod-db`,
-  adopt: true,
-})
-const libraryDb = await D1Database(`library-${app.stage}-db`, {
-  name: `library-${app.stage}-db`,
-  adopt: true,
-})
+const managedDbBindings = Object.fromEntries(
+  await Promise.all(
+    MANAGED_APPS.map(async (managedApp) => [
+      managedApp.bindingKey,
+      await D1Database(managedApp.dbName, {
+        name: managedApp.dbName,
+        adopt: true,
+      }),
+    ]),
+  ),
+)
 
 /**
  * Catch-all host Worker. Deploys to a workers.dev URL; attach the custom-domain
@@ -67,10 +72,7 @@ export const worker = await Worker('worker', {
   bindings: {
     ASSETS: staticAssets,
     DB: database,
-    DB_EVENTS: eventsDb,
-    DB_LIBRARY: libraryDb,
-    // Comma-separated DID allowlist that bootstraps the first host admin(s).
-    ADMIN_DIDS: process.env.ADMIN_DIDS ?? '',
+    ...managedDbBindings,
   },
   assets: {
     html_handling: 'auto-trailing-slash',

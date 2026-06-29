@@ -3,22 +3,9 @@
 There are two kinds of admin in this repo:
 
 1. **Host console operators** — who may use the Settings → Admin section to manage users
-   across mini apps. Gated by the **host's own** D1 (`is_admin` in its `users` table) plus
-   the `ADMIN_DIDS` bootstrap allowlist.
+   across mini apps. Gated by the **host's own** D1 (`is_admin` in its `users` table)
 2. **Per-app admins** — a user flagged `is_admin` in a specific mini app's D1. Operators
    set these from the host console (or via SQL on that app's DB).
-
-## Bootstrap the first host operator
-
-The first operator can't grant themselves through the UI, so seed them once. Either set the
-`ADMIN_DIDS` env var on the host Worker (comma-separated DIDs)…
-
-```bash
-# local dev: edit wrangler.toml -> [vars] ADMIN_DIDS = "did:key:z..."
-# production: set ADMIN_DIDS in your deploy env (read by alchemy.run.ts)
-```
-
-…or write directly to the host D1:
 
 ```bash
 # Dev (local host D1)

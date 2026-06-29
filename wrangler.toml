@@ -23,13 +23,9 @@ database_name = "events-dev-db"
 database_id = "REPLACE_WITH_EVENTS_DB_ID"
 
 [[d1_databases]]
-binding = "DB_LIBRARY"
-database_name = "library-dev-db"
-database_id = "REPLACE_WITH_LIBRARY_DB_ID"
-
-# Comma-separated DID allowlist that bootstraps the first host admin(s) in local dev.
-[vars]
-ADMIN_DIDS = ""
+binding = "DB_PARTY_PICS"
+database_name = "party-pics-dev-db"
+database_id = "REPLACE_WITH_PARTY_PICS_DB_ID"
 
 # Static assets (client build)
 # In dev: Vite serves the client at :5173 (this is unused).

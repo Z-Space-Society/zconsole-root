@@ -79,15 +79,9 @@ app.post('/api/add-avatar', async (c) => {
  * ------------------------------------------------------------------------- */
 
 /**
- * Is this DID allowed to use the admin console? True if it's in the bootstrap
- * `ADMIN_DIDS` allowlist, or flagged `is_admin` in the host's own D1.
+ * Is this DID allowed to use the admin console? True if flagged `is_admin` in the host's own D1.
  */
 async function isHostAdmin(env: Env, did: string): Promise<boolean> {
-  const allowlist = (env.ADMIN_DIDS ?? '')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean)
-  if (allowlist.includes(did)) return true
   try {
     return await UserModel.isUserAdmin(createDb(env.DB), did)
   } catch {

@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@noble/curves": "^2.0.1",
+    "@starter/shared": "workspace:*",
     "base58-universal": "^2.0.0",
     "drizzle-orm": "^0.44.7",
     "jwt-decode": "^4.0.0"

@@ -119,6 +119,4 @@ What this means for a child app:
   it in `alchemy.run.ts`, `wrangler.toml`, and `server/src/admin-apps.ts`.
 
 Authorization lives entirely on the host: it verifies the operator's JWT with
-`decodeAndVerifyJWT` and checks the issuer DID against its own `is_admin` allowlist /
-`ADMIN_DIDS` (see [`docs/admin-setup.md`](./admin-setup.md)). Child apps don't authorize
-these writes — they simply own the schema the host writes to.
+`decodeAndVerifyJWT` and checks the issuer DID against its own `is_admin` allowlist.
