@@ -22,8 +22,8 @@ binding = "DB_EVENTS"
 database_name = "events-dev-db"
 database_id = "REPLACE_WITH_EVENTS_DB_ID"
 
-# party-pics intentionally omitted — app not deployed yet. Add a DB_PARTY_PICS block back here
-# (and to MANAGED_APPS in shared/src/apps.ts) when the party-pics app ships.
+# photos intentionally omitted — app not deployed yet. Add a DB_PHOTOS block back here
+# (and to MANAGED_APPS in shared/src/apps.ts) when the photos app ships.
 
 # Static assets (client build)
 # In dev: Vite serves the client at :5173 (this is unused).

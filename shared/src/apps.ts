@@ -8,7 +8,7 @@
  * provisions or migrates them. Each child app owns and migrates its own D1. `databaseId`
  * is the sync point: if a child app ever replaces its DB (new UUID), update it here.
  */
-export type ChildBindingKey = 'DB_EVENTS' // re-add 'DB_PARTY_PICS' when party-pics ships
+export type ChildBindingKey = 'DB_EVENTS' // re-add 'DB_PHOTOS' when photos ships
 
 export interface ManagedApp {
   /** URL slug, matches an entry in client/src/apps.ts. */
@@ -28,6 +28,6 @@ export const MANAGED_APPS: ManagedApp[] = [
     dbName: 'zconsole-events-mini-app-prod-db',
     databaseId: '50100a65-0bab-4b73-9185-2103f804a07f',
   },
-  // party-pics intentionally omitted — DB not deployed yet. Add it back here (with its real
-  // UUID) and restore 'DB_PARTY_PICS' to ChildBindingKey when the party-pics app ships.
+  // photos intentionally omitted — DB not deployed yet. Add it back here (with its real
+  // UUID) and restore 'DB_PHOTOS' to ChildBindingKey when the photos app ships.
 ]
